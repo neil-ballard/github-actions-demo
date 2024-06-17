@@ -1,12 +1,10 @@
+
 name: build-test-deploy
-
-on:
-  push
-
-jobs:
+on: push
+jobs: 
   build:
     runs-on: ubuntu-latest
-    steps:
+    steps: 
       - name: checkout repo
         uses: actions/checkout@v4
       - name: use node.js
@@ -19,7 +17,7 @@ jobs:
   test:
     needs: build
     runs-on: ubuntu-latest
-    steps:
+    steps: 
       - name: checkout repo
         uses: actions/checkout@v4
       - name: use node.js
@@ -31,7 +29,18 @@ jobs:
 
   deploy:
     needs: test
+
+    permissions:
+      contents: write
+      pages: write     
+      id-token: write  
+
+    environment:
+      name: production
+      url: ${{ steps.deployment.outputs.page_url }}
+    
     runs-on: ubuntu-latest
+    
     steps:
       - name: checkout repo
         uses: actions/checkout@v4
@@ -46,8 +55,9 @@ jobs:
         with:
           static_site_generator: next
       - run: npm install
-      - run: npm run build
+      - run: npm run build    
       - name: upload artifacts
         uses: actions/upload-pages-artifact@v3
-        with:
+        with: 
           path: './out'
+      - name: deploy
